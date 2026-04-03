@@ -1,0 +1,20 @@
+[package]
+name = "procon"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+ac-library-rs = "=0.2.0"
+arboard = "3.6.1"
+colored = "3.0.0"
+itertools = "=0.14.0"
+num-integer = "=0.1.46"
+num-traits = "=0.2.19"
+proconio = { version = "=0.5.0", features = ["derive"] }
+rand = "=0.9.2"
+rustc-hash = "=2.1.1"
+superslice = "=1.0.0"
+
+[[bin]]
+name = "submit"
+path = "tools/submit.rs"
