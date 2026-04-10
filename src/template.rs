@@ -32,7 +32,6 @@ pub use std::{
     process::exit,
     time::Instant,
 };
-pub use superslice::Ext;
 
 pub const DIR4: [(usize, usize); 4] = [(!0, 0), (0, !0), (0, 1), (1, 0)];
 pub const DIR8: [(usize, usize); 8] = [(!0, !0), (!0, 0), (!0, 1), (0, !0), (0, 1), (1, !0), (1, 0), (1, 1)];
