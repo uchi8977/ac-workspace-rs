@@ -13,7 +13,7 @@ pub use ac_library::{
     ModInt998244353 as Mint9,
 };
 pub use itertools::Itertools;
-pub use num_integer::{gcd, lcm};
+pub use num_integer::Integer;
 pub use proconio::{
     input,
     input_interactive,
