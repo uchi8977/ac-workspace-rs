@@ -43,12 +43,6 @@ pub struct FxHashMultiSet<T: Eq + Hash> {
 }
 
 impl<T: Eq + Hash> FxHashMultiSet<T> {
-    pub fn default() -> Self {
-        Self {
-            map: FxHashMap::default(),
-            len: 0,
-        }
-    }
     pub fn insert(&mut self, val: T) {
         self.len += 1;
         *self.map.entry(val).or_insert(0) += 1;
@@ -85,6 +79,15 @@ impl<T: Eq + Hash> FxHashMultiSet<T> {
         self.map
             .iter()
             .flat_map(|(val, &cnt)| itertools::repeat_n(val, cnt))
+    }
+}
+
+impl<T: Eq + Hash> Default for FxHashMultiSet<T> {
+    fn default() -> Self {
+        Self {
+            map: FxHashMap::default(),
+            len: 0,
+        }
     }
 }
 
@@ -248,7 +251,7 @@ pub trait ChOrd: PartialOrd + Copy {
 impl<T: PartialOrd + Copy> ChOrd for T {}
 
 pub trait ItertoolsExt: Iterator {
-    fn counts_btree(self) -> BTreeMap<Self::Item, usize>
+    fn btree_counts(self) -> BTreeMap<Self::Item, usize>
     where
         Self: Sized,
         Self::Item: Ord,
@@ -257,7 +260,7 @@ pub trait ItertoolsExt: Iterator {
         self.for_each(|item| *counts.entry(item).or_default() += 1);
         counts
     }
-    fn counts_fx(self) -> FxHashMap<Self::Item, usize>
+    fn fx_counts(self) -> FxHashMap<Self::Item, usize>
     where
         Self: Sized,
         Self::Item: Eq + Hash,
