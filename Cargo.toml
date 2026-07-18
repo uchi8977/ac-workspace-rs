@@ -16,13 +16,13 @@ rustc-hash = "=2.1.1"
 superslice = "=1.0.0"
 
 [[bin]]
+name = "base"
+path = "src/base.rs"
+
+[[bin]]
 name = "submit"
 path = "tools/submit.rs"
 
 [[bin]]
 name = "init"
 path = "tools/init.rs"
-
-[[bin]]
-name = "base"
-path = "src/base.rs"
