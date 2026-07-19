@@ -1,5 +1,3 @@
-// https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bl
-
 use procon::template::*;
 
 fn main() {
@@ -40,3 +38,5 @@ fn main() {
         }
     }
 }
+
+// https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_bl
