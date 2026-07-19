@@ -33,3 +33,11 @@ crrio() {
 cre() {
     cargo run --example "$1"
 }
+
+sub() {
+    cargo run --bin submit -- "src/bin/$1.rs"
+}
+
+init() {
+    cargo run --bin init -- "$@"
+}

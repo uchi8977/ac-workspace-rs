@@ -26,14 +26,17 @@ fn main() {
         }
         for &(to, w) in &graph[v] {
             let nd = d + w;
-            if nd < dist[to] {
-                dist[to] = nd;
+            if dist[to].chmin(nd) {
                 heap.push((Reverse(nd), to));
             }
         }
     }
 
     for d in dist {
-        println!("{}", if d == !0 { -1 } else { d as isize });
+        if d == !0 {
+            println!("-1");
+        } else {
+            println!("{d}");
+        }
     }
 }
