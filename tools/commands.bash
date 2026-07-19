@@ -38,6 +38,10 @@ sub() {
     cargo run --bin submit -- "src/bin/$1.rs"
 }
 
+sube() {
+    cargo run --bin submit -- "examples/$1.rs"
+}
+
 init() {
     cargo run --bin init -- "$@"
 }

@@ -9,7 +9,6 @@ fn main() {
 
     let mut ng = -1;
     let mut ok = n as isize;
-
     while ok - ng > 1 {
         let mid = (ok + ng) / 2;
         if a[mid as usize] >= x {
