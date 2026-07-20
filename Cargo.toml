@@ -3,6 +3,10 @@ name = "procon"
 version = "0.1.0"
 edition = "2024"
 
+[workspace]
+members = [".", "examples/edpc"]
+resolver = "3"
+
 [dependencies]
 ac-library-rs = "=0.2.0"
 arboard = "3.6.1"
