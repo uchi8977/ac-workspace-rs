@@ -1,32 +1,30 @@
 use core::{convert::Infallible, marker::PhantomData};
-use num_traits::{Zero, Bounded, PrimInt, Unsigned};
+use num_traits::{Bounded, PrimInt, Unsigned, Zero};
 use std::{
     hash::Hash,
     ops::{Add, BitAnd, BitOr, BitXor},
 };
 
 pub use ac_library::{
+    ModInt998244353 as Mint9, ModInt1000000007 as Mint1,
     dsu::Dsu,
     segtree::{Additive, Max, Min, Multiplicative, Segtree},
     string::z_algorithm_arbitrary,
-    ModInt1000000007 as Mint1,
-    ModInt998244353 as Mint9,
 };
 pub use itertools::Itertools;
 pub use num_integer::Integer;
 pub use proconio::{
-    input,
-    input_interactive,
+    input, input_interactive,
     marker::{Chars, Isize1, Usize1},
 };
 pub use rand::{
+    Rng, rng,
     seq::{IteratorRandom, SliceRandom},
-    rng, Rng,
 };
 pub use rustc_hash::{FxHashMap, FxHashSet};
 pub use std::{
     cmp::Reverse,
-    collections::{btree_map, BTreeMap, BTreeSet, BinaryHeap, VecDeque},
+    collections::{BTreeMap, BTreeSet, BinaryHeap, VecDeque, btree_map},
     f64::consts::PI,
     mem::swap,
     process::exit,
@@ -34,7 +32,16 @@ pub use std::{
 };
 
 pub const DIR4: [(usize, usize); 4] = [(!0, 0), (0, !0), (0, 1), (1, 0)];
-pub const DIR8: [(usize, usize); 8] = [(!0, !0), (!0, 0), (!0, 1), (0, !0), (0, 1), (1, !0), (1, 0), (1, 1)];
+pub const DIR8: [(usize, usize); 8] = [
+    (!0, !0),
+    (!0, 0),
+    (!0, 1),
+    (0, !0),
+    (0, 1),
+    (1, !0),
+    (1, 0),
+    (1, 1),
+];
 
 #[derive(Debug, Clone)]
 pub struct FxHashMultiSet<T: Eq + Hash> {

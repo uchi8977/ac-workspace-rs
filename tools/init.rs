@@ -5,8 +5,7 @@ use std::fs;
 fn main() {
     let keep: HashSet<String> = env::args().skip(1).collect();
 
-    let base = fs::read_to_string("src/base.rs")
-        .expect("failed to read `src/base.rs`");
+    let base = fs::read_to_string("src/base.rs").expect("failed to read `src/base.rs`");
 
     for entry in fs::read_dir("src/bin").expect("failed to read `src/bin`") {
         let path = entry.expect("failed to read entry").path();
