@@ -24,5 +24,4 @@ fn main() {
     // println!("{}", a.partition_point(|&v| v < x) + 1);
 }
 
-
 // https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_k
