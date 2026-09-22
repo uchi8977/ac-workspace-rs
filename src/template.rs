@@ -1,8 +1,8 @@
 use core::{convert::Infallible, marker::PhantomData};
-use num_traits::{Bounded, PrimInt, Unsigned, Zero};
+use num_traits::{PrimInt, Unsigned, Zero};
 use std::{
     hash::Hash,
-    ops::{Add, BitAnd, BitOr, BitXor},
+    ops::{Add, BitOr, BitXor},
 };
 
 pub use ac_library::{
@@ -211,11 +211,11 @@ where
 pub struct BitAndMonoid<S>(Infallible, PhantomData<fn() -> S>);
 impl<S> ac_library::segtree::Monoid for BitAndMonoid<S>
 where
-    S: Copy + BitAnd<Output = S> + Bounded,
+    S: PrimInt,
 {
     type S = S;
     fn identity() -> Self::S {
-        S::max_value()
+        !S::zero()
     }
     fn binary_operation(a: &Self::S, b: &Self::S) -> Self::S {
         *a & *b
@@ -318,7 +318,7 @@ where
 {
     let mut ret = vec![];
     let mut i = T::one() + T::one();
-    while i * i <= n {
+    while i <= n / i {
         while n % i == T::zero() {
             ret.push(i);
             n = n / i;
@@ -336,7 +336,7 @@ where
     T: PrimInt + Unsigned,
     U: PrimInt + Unsigned,
 {
-    let mut ret = T::one();
+    let mut ret = T::one() % modu;
     base = base % modu;
     while exp != U::zero() {
         if (exp & U::one()) == U::one() {
