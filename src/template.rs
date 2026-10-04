@@ -194,6 +194,109 @@ impl<'a, T: Ord> IntoIterator for &'a BTreeMultiSet<T> {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct IntervalSet<T: Ord + Copy> {
+    map: BTreeMap<T, T>,
+}
+
+impl<T: Ord + Copy> IntervalSet<T> {
+    pub fn new() -> Self {
+        Self {
+            map: BTreeMap::new(),
+        }
+    }
+    pub fn insert(&mut self, mut l: T, mut r: T) -> bool {
+        if l >= r {
+            return false;
+        }
+        if let Some((&a, &b)) = self.map.range(..=l).next_back() {
+            if r <= b {
+                return false;
+            }
+            if l <= b {
+                self.map.remove(&a);
+                l = a;
+            }
+        }
+        while let Some((&a, &b)) = self.map.range(l..=r).next() {
+            self.map.remove(&a);
+            r = r.max(b);
+        }
+        self.map.insert(l, r);
+        true
+    }
+    pub fn remove(&mut self, l: T, r: T) -> bool {
+        if l >= r {
+            return false;
+        }
+        let mut changed = false;
+        if let Some((a, b)) = self.get(l) {
+            self.map.remove(&a);
+            if a < l {
+                self.map.insert(a, l);
+            }
+            if r < b {
+                self.map.insert(r, b);
+                return true;
+            }
+            changed = true;
+        }
+        while let Some((&a, &b)) = self.map.range(l..r).next() {
+            self.map.remove(&a);
+            changed = true;
+            if r < b {
+                self.map.insert(r, b);
+                break;
+            }
+        }
+        changed
+    }
+    pub fn get(&self, x: T) -> Option<(T, T)> {
+        self.map
+            .range(..=x)
+            .next_back()
+            .filter(|&(_, &r)| x < r)
+            .map(|(&l, &r)| (l, r))
+    }
+    pub fn contains(&self, x: T) -> bool {
+        self.get(x).is_some()
+    }
+    pub fn contains_range(&self, l: T, r: T) -> bool {
+        l >= r || self.get(l).is_some_and(|(_, b)| r <= b)
+    }
+    pub fn mex(&self, x: T) -> T {
+        self.get(x).map_or(x, |(_, r)| r)
+    }
+    pub fn clear(&mut self) {
+        self.map.clear();
+    }
+    pub fn is_empty(&self) -> bool {
+        self.map.is_empty()
+    }
+    pub fn len(&self) -> usize {
+        self.map.len()
+    }
+    pub fn iter(&self) -> impl DoubleEndedIterator<Item = (T, T)> + ExactSizeIterator {
+        self.map.iter().map(|(&l, &r)| (l, r))
+    }
+}
+
+impl<T: Ord + Copy> Default for IntervalSet<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<T: Ord + Copy> FromIterator<(T, T)> for IntervalSet<T> {
+    fn from_iter<I: IntoIterator<Item = (T, T)>>(iter: I) -> Self {
+        let mut set = Self::new();
+        for (l, r) in iter {
+            set.insert(l, r);
+        }
+        set
+    }
+}
+
 pub struct BitOrMonoid<S>(Infallible, PhantomData<fn() -> S>);
 impl<S> ac_library::segtree::Monoid for BitOrMonoid<S>
 where
