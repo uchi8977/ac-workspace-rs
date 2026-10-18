@@ -1,3 +1,4 @@
+// https://github.com/uchi8977/ac-workspace-rs
 use core::{convert::Infallible, marker::PhantomData};
 use num_traits::{PrimInt, Unsigned, Zero};
 use std::{
