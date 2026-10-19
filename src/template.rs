@@ -392,17 +392,17 @@ where
     let mut ord = (0..n).collect_vec();
     ord.sort_unstable_by_key(|&i| &v[i]);
 
-    let mut values = Vec::new();
-    let mut ranks = vec![0; n];
+    let mut unique_sorted = Vec::new();
+    let mut compressed = vec![0; n];
 
     for (k, &i) in ord.iter().enumerate() {
         if k == 0 || v[i] != v[ord[k - 1]] {
-            values.push(v[i]);
+            unique_sorted.push(v[i]);
         }
-        ranks[i] = values.len() - 1;
+        compressed[i] = unique_sorted.len() - 1;
     }
 
-    (ranks, values)
+    (compressed, unique_sorted)
 }
 
 pub fn cumsum<T>(v: &[T]) -> Vec<T>
