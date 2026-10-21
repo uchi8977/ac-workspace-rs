@@ -2,6 +2,7 @@
 name = "procon"
 version = "0.1.0"
 edition = "2024"
+license = "0BSD"
 
 [workspace]
 members = [".", "examples/edpc"]
