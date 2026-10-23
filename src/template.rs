@@ -298,6 +298,134 @@ impl<T: Ord + Copy> FromIterator<(T, T)> for IntervalSet<T> {
     }
 }
 
+pub struct Dst<M: ac_library::segtree::Monoid> {
+    table: Vec<Vec<M::S>>,
+}
+
+impl<M: ac_library::segtree::Monoid> Dst<M> {
+    pub fn new(n: usize) -> Self {
+        vec![M::identity(); n].into()
+    }
+    pub fn get(&self, p: usize) -> M::S {
+        self.table[0][p].clone()
+    }
+    pub fn get_slice(&self) -> &[M::S] {
+        &self.table[0]
+    }
+    pub fn prod<R>(&self, range: R) -> M::S
+    where
+        R: std::ops::RangeBounds<usize>,
+    {
+        use std::ops::Bound;
+
+        let l = match range.start_bound() {
+            Bound::Included(&l) => l,
+            Bound::Excluded(&l) => l.checked_add(1).expect("range bound overflow"),
+            Bound::Unbounded => 0,
+        };
+        let r = match range.end_bound() {
+            Bound::Included(&r) => r.checked_add(1).expect("range bound overflow"),
+            Bound::Excluded(&r) => r,
+            Bound::Unbounded => self.len(),
+        };
+        assert!(l <= r && r <= self.len());
+        if l == r {
+            return M::identity();
+        }
+        let r = r - 1;
+        if l == r {
+            return self.get(l);
+        }
+        let k = (usize::BITS - 1 - (l ^ r).leading_zeros()) as usize;
+        M::binary_operation(&self.table[k][l], &self.table[k][r])
+    }
+    pub fn all_prod(&self) -> M::S {
+        self.prod(..)
+    }
+    pub fn max_right<F>(&self, l: usize, f: F) -> usize
+    where
+        F: Fn(&M::S) -> bool,
+    {
+        assert!(l <= self.len());
+        assert!(f(&M::identity()));
+        let (mut lo, mut hi) = (l, self.len());
+        while lo < hi {
+            let mid = lo + (hi - lo) / 2 + 1;
+            if f(&self.prod(l..mid)) {
+                lo = mid;
+            } else {
+                hi = mid - 1;
+            }
+        }
+        lo
+    }
+    pub fn min_left<F>(&self, r: usize, f: F) -> usize
+    where
+        F: Fn(&M::S) -> bool,
+    {
+        assert!(r <= self.len());
+        assert!(f(&M::identity()));
+        let (mut lo, mut hi) = (0, r);
+        while lo < hi {
+            let mid = lo + (hi - lo) / 2;
+            if f(&self.prod(mid..r)) {
+                hi = mid;
+            } else {
+                lo = mid + 1;
+            }
+        }
+        lo
+    }
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+    pub fn len(&self) -> usize {
+        self.table[0].len()
+    }
+}
+
+impl<M: ac_library::segtree::Monoid> Default for Dst<M> {
+    fn default() -> Self {
+        Self::new(0)
+    }
+}
+
+impl<M: ac_library::segtree::Monoid> From<Vec<M::S>> for Dst<M> {
+    fn from(v: Vec<M::S>) -> Self {
+        let levels = (usize::BITS - v.len().saturating_sub(1).leading_zeros()) as usize;
+        let mut table = vec![v];
+        for k in 1..levels {
+            let half = 1usize << k;
+            let mut row = table[0].clone();
+            for block in row.chunks_mut(half * 2) {
+                let mid = half.min(block.len());
+                for i in (0..mid - 1).rev() {
+                    block[i] = M::binary_operation(&block[i], &block[i + 1]);
+                }
+                for i in mid + 1..block.len() {
+                    block[i] = M::binary_operation(&block[i - 1], &block[i]);
+                }
+            }
+            table.push(row);
+        }
+        Self { table }
+    }
+}
+
+impl<M: ac_library::segtree::Monoid> FromIterator<M::S> for Dst<M> {
+    fn from_iter<I: IntoIterator<Item = M::S>>(iter: I) -> Self {
+        Self::from(iter.into_iter().collect::<Vec<_>>())
+    }
+}
+
+impl<M: ac_library::segtree::Monoid> Clone for Dst<M> {
+    fn clone(&self) -> Self {
+        Self {
+            table: self.table.clone(),
+        }
+    }
+}
+
 pub struct BitOrMonoid<S>(Infallible, PhantomData<fn() -> S>);
 impl<S> ac_library::segtree::Monoid for BitOrMonoid<S>
 where
