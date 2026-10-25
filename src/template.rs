@@ -1,4 +1,4 @@
-// https://github.com/uchi8977/ac-workspace-rs
+// https://github.com/uchi8977/ac-workspace-rs/blob/main/src/template.rs
 use core::{convert::Infallible, marker::PhantomData};
 use num_traits::{PrimInt, Unsigned, Zero};
 use std::{
@@ -7,7 +7,7 @@ use std::{
 };
 
 pub use ac_library::{
-    ModInt998244353 as Mint9, ModInt1000000007 as Mint1,
+    ModInt998244353, ModInt1000000007,
     dsu::Dsu,
     segtree::{Additive, Max, Min, Multiplicative, Segtree},
     string::z_algorithm_arbitrary,
