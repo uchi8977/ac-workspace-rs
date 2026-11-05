@@ -18,14 +18,14 @@ fn main() {
     dist[0] = 0;
     heap.push((Reverse(0), 0));
 
-    while let Some((Reverse(d), v)) = heap.pop() {
-        if d != dist[v] {
+    while let Some((Reverse(d), pos)) = heap.pop() {
+        if d != dist[pos] {
             continue;
         }
-        for &(to, w) in &graph[v] {
+        for &(npos, w) in &graph[pos] {
             let nd = d + w;
-            if dist[to].chmin(nd) {
-                heap.push((Reverse(nd), to));
+            if dist[npos].chmin(nd) {
+                heap.push((Reverse(nd), npos));
             }
         }
     }
