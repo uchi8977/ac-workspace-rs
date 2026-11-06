@@ -1,15 +1,12 @@
 // https://github.com/uchi8977/ac-workspace-rs/blob/main/src/template.rs
 use core::{convert::Infallible, marker::PhantomData};
 use num_traits::{PrimInt, Unsigned, Zero};
-use std::{
-    hash::Hash,
-    ops::{Add, BitOr, BitXor},
-};
+use std::{hash::Hash, ops::Add};
 
 pub use ac_library::{
     ModInt998244353, ModInt1000000007,
     dsu::Dsu,
-    segtree::{Additive, Max, Min, Multiplicative, Segtree},
+    segtree::{Additive, BitwiseAnd, BitwiseOr, BitwiseXor, Monoid, Multiplicative, Segtree},
     string::z_algorithm_arbitrary,
 };
 pub use itertools::Itertools;
@@ -298,11 +295,11 @@ impl<T: Ord + Copy> FromIterator<(T, T)> for IntervalSet<T> {
     }
 }
 
-pub struct Dst<M: ac_library::segtree::Monoid> {
+pub struct Dst<M: Monoid> {
     table: Vec<Vec<M::S>>,
 }
 
-impl<M: ac_library::segtree::Monoid> Dst<M> {
+impl<M: Monoid> Dst<M> {
     pub fn new(n: usize) -> Self {
         vec![M::identity(); n].into()
     }
@@ -384,13 +381,13 @@ impl<M: ac_library::segtree::Monoid> Dst<M> {
     }
 }
 
-impl<M: ac_library::segtree::Monoid> Default for Dst<M> {
+impl<M: Monoid> Default for Dst<M> {
     fn default() -> Self {
         Self::new(0)
     }
 }
 
-impl<M: ac_library::segtree::Monoid> From<Vec<M::S>> for Dst<M> {
+impl<M: Monoid> From<Vec<M::S>> for Dst<M> {
     fn from(v: Vec<M::S>) -> Self {
         let levels = (usize::BITS - v.len().saturating_sub(1).leading_zeros()) as usize;
         let mut table = vec![v];
@@ -412,13 +409,13 @@ impl<M: ac_library::segtree::Monoid> From<Vec<M::S>> for Dst<M> {
     }
 }
 
-impl<M: ac_library::segtree::Monoid> FromIterator<M::S> for Dst<M> {
+impl<M: Monoid> FromIterator<M::S> for Dst<M> {
     fn from_iter<I: IntoIterator<Item = M::S>>(iter: I) -> Self {
         Self::from(iter.into_iter().collect::<Vec<_>>())
     }
 }
 
-impl<M: ac_library::segtree::Monoid> Clone for Dst<M> {
+impl<M: Monoid> Clone for Dst<M> {
     fn clone(&self) -> Self {
         Self {
             table: self.table.clone(),
@@ -426,45 +423,85 @@ impl<M: ac_library::segtree::Monoid> Clone for Dst<M> {
     }
 }
 
-pub struct BitOrMonoid<S>(Infallible, PhantomData<fn() -> S>);
-impl<S> ac_library::segtree::Monoid for BitOrMonoid<S>
-where
-    S: Copy + BitOr<Output = S> + Zero,
-{
+pub trait BoundedOrd: Copy + Ord {
+    fn min_value() -> Self;
+    fn max_value() -> Self;
+}
+
+macro_rules! impl_bounded_ord {
+    ($($t:ty),* $(,)?) => {
+        $(
+            impl BoundedOrd for $t {
+                fn min_value() -> Self {
+                    <$t>::MIN
+                }
+                fn max_value() -> Self {
+                    <$t>::MAX
+                }
+            }
+        )*
+    };
+}
+
+impl_bounded_ord!(
+    i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize,
+);
+
+macro_rules! impl_tuple_bounded_ord {
+    ($(($($T:ident),+)),* $(,)?) => {
+        $(
+            impl<$($T: BoundedOrd),+> BoundedOrd for ($($T,)+) {
+                fn min_value() -> Self {
+                    ($($T::min_value(),)+)
+                }
+
+                fn max_value() -> Self {
+                    ($($T::max_value(),)+)
+                }
+            }
+        )*
+    };
+}
+
+impl_tuple_bounded_ord!(
+    (A, B),
+    (A, B, C),
+    (A, B, C, D),
+    (A, B, C, D, E),
+    (A, B, C, D, E, F),
+    (A, B, C, D, E, F, G),
+    (A, B, C, D, E, F, G, H),
+    (A, B, C, D, E, F, G, H, I),
+    (A, B, C, D, E, F, G, H, I, J),
+    (A, B, C, D, E, F, G, H, I, J, K),
+    (A, B, C, D, E, F, G, H, I, J, K, L),
+);
+
+pub struct Max<S>(Infallible, PhantomData<fn() -> S>);
+
+impl<S: BoundedOrd> Monoid for Max<S> {
     type S = S;
+
     fn identity() -> Self::S {
-        S::zero()
+        S::min_value()
     }
+
     fn binary_operation(a: &Self::S, b: &Self::S) -> Self::S {
-        *a | *b
+        *a.max(b)
     }
 }
 
-pub struct BitAndMonoid<S>(Infallible, PhantomData<fn() -> S>);
-impl<S> ac_library::segtree::Monoid for BitAndMonoid<S>
-where
-    S: PrimInt,
-{
-    type S = S;
-    fn identity() -> Self::S {
-        !S::zero()
-    }
-    fn binary_operation(a: &Self::S, b: &Self::S) -> Self::S {
-        *a & *b
-    }
-}
+pub struct Min<S>(Infallible, PhantomData<fn() -> S>);
 
-pub struct BitXorMonoid<S>(Infallible, PhantomData<fn() -> S>);
-impl<S> ac_library::segtree::Monoid for BitXorMonoid<S>
-where
-    S: Copy + BitXor<Output = S> + Zero,
-{
+impl<S: BoundedOrd> Monoid for Min<S> {
     type S = S;
+
     fn identity() -> Self::S {
-        S::zero()
+        S::max_value()
     }
+
     fn binary_operation(a: &Self::S, b: &Self::S) -> Self::S {
-        *a ^ *b
+        *a.min(b)
     }
 }
 
