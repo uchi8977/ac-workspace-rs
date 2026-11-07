@@ -45,3 +45,11 @@ sube() {
 init() {
     cargo run --bin init -- "$@"
 }
+
+procon() {
+    cd ~/projects/procon || return
+    nvim -p src/bin/{a,b,c,d,e}.rs \
+        -c '0tabnew' \
+        -c 'terminal' \
+        -c 'tabnext 2'
+}
