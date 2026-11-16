@@ -17,7 +17,6 @@ fn main() {
     let mut heap = BinaryHeap::new();
     dist[0] = 0;
     heap.push((Reverse(0), 0));
-
     while let Some((Reverse(d), pos)) = heap.pop() {
         if d != dist[pos] {
             continue;

@@ -11,6 +11,7 @@ resolver = "3"
 [dependencies]
 ac-library-rs = "=0.2.0"
 arboard = "3.6.1"
+base64 = "0.22"
 colored = "3.0.0"
 itertools = "=0.14.0"
 num-integer = "=0.1.46"
