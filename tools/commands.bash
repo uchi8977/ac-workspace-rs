@@ -48,7 +48,7 @@ init() {
 
 procon() {
     cd ~/projects/procon || return
-    nvim -p src/bin/{a,b,c,d,e}.rs \
+    nvim -p src/bin/{a,b,c,d,e,f,g}.rs \
         -c '0tabnew' \
         -c 'terminal' \
         -c 'tabnext 2'
